@@ -2,68 +2,49 @@ using System;
 
 namespace HotelApp
 {
-    public class h1 
+    public class h1
     {
-        // Atributos publicos
+        // Atributos públicos (Deuda técnica inicial)
         public int t; // tipo habitacion (1: Individual, 2: Doble, 3: Suite)
         public int d; // dias de estancia
         public bool v; // es cliente VIP
         public int b; // incluye desayuno (1: si, 0: no)
 
-        // Metodo para procesar y calcular el precio
-        public decimal procesar() 
+        /// <summary>
+        /// Método principal procesar. Refactorizado por Alumno B (Fase 3).
+        /// </summary>
+        public decimal procesar()
         {
-            // Inicializo la variable res a 0
-            decimal res = 0;
-            
-            // Si los dias son mayores que 0
-            if (d > 0)
-            {
-                // Calculo base de la habitacion
-                if (t == 1)
-                {
-                    res = d * 50;
-                }
-                else if (t == 2)
-                {
-                    res = d * 75;
-                }
-                else if (t == 3)
-                {
-                    res = d * 150;
-                }
-                else 
-                {
-                    // Falla si el tipo no es 1, 2 o 3
-                    throw new Exception("Tipo invalido");
-                }
+            // Cláusula de guarda para evitar días negativos
+            if (d < 0) throw new Exception("Dias no validos");
 
-                // Añadimos el precio del desayuno si b es igual a 1
-                if (b == 1)
-                {
-                    res = res + (d * 12); // 12 euros por dia de desayuno
-                }
-                
-                // Aplicamos el Descuento VIP si v es true
-                if (v == true)
-                {
-                    res = res * 0.85m; 
-                }
+            // FASE 3: Uso del método extraído para obtener la tarifa base
+            decimal tarifaBase = CalcularTarifaBase();
+            decimal res = d * tarifaBase;
 
-                // Descuento extra de larga estancia si son mas de 7 dias
-                if (d > 7)
-                {
-                    res = res - (res * 0.05m); 
-                }
-            }
-            else
-            {
-                // Falla si dias es menor o igual a 0
-                throw new Exception("Dias no validos");
-            }
+            // Lógica de extras (desayuno)
+            if (b == 1) res += (d * 15);
 
-            // Devuelvo el resultado
+            // Lógica de descuentos (VIP y Estancia Larga)
+            if (d >= 10) res *= 0.95m; // Descuento 5% estancia larga
+            if (v) res *= 0.85m;       // Descuento 15% VIP
+
             return res;
+        }
+
+        /// <summary>
+        /// FASE 3: Alumno B - Método extraído para calcular la tarifa según el tipo.
+        /// Implementa una estructura switch moderna.
+        /// </summary>
+        private decimal CalcularTarifaBase()
+        {
+            return t switch
+            {
+                1 => 50m,  // Tarifa Individual
+                2 => 75m,  // Tarifa Doble
+                3 => 150m, // Tarifa Suite
+                _ => throw new Exception("Tipo invalido")
+            };
         }
     }
 }
